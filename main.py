@@ -39,7 +39,6 @@ def getEnabled(chat_id):
         return es.enabled
     return False
 
-
 # ================================
 
 class MeHandler(webapp2.RequestHandler):
@@ -83,21 +82,40 @@ class WebhookHandler(webapp2.RequestHandler):
             logging.info('no text')
             return
 
-        def reply(msg=None, img=None):
+        def reply(msg=None, img=None, stk=None, audio=None, doc=None, fw=None):
             if msg:
                 resp = urllib2.urlopen(BASE_URL + 'sendMessage', urllib.urlencode({
                     'chat_id': str(chat_id),
-                    'text': msg.encode('utf-8'),
+                    'text': msg,
                     'disable_web_page_preview': 'true',
-                    'reply_to_message_id': str(message_id),
                 })).read()
             elif img:
                 resp = multipart.post_multipart(BASE_URL + 'sendPhoto', [
                     ('chat_id', str(chat_id)),
-                    ('reply_to_message_id', str(message_id)),
                 ], [
                     ('photo', 'image.jpg', img),
                 ])
+            elif stk:
+                resp = urllib2.urlopen(BASE_URL + 'sendSticker', urllib.urlencode({
+                    'chat_id': str(chat_id),
+                    'sticker': stk,
+                })).read()
+            elif audio:
+                resp = urllib2.urlopen(BASE_URL + 'sendAudio', urllib.urlencode({
+                    'chat_id': str(chat_id),
+                    'audio': audio,
+                })).read()
+            elif doc:
+                resp = urllib2.urlopen(BASE_URL + 'sendDocument', urllib.urlencode({
+                    'chat_id': str(chat_id),
+                    'document': doc,
+                })).read()
+            elif fw:
+                resp = urllib2.urlopen(BASE_URL + 'forwardMessage', urllib.urlencode({
+                    'chat_id': fw,
+                    'from_chat_id': str(chat_id),
+                    'message_id': str(message_id),
+                })).read()
             else:
                 logging.error('no msg or img specified')
                 resp = None
@@ -106,12 +124,14 @@ class WebhookHandler(webapp2.RequestHandler):
             logging.info(resp)
 
         if text.startswith('/'):
-            if text == '/start':
-                reply('Bot enabled')
+            if text.lower() == '/start':
+                reply('Bot enabled.\nSend /commands')
                 setEnabled(chat_id, True)
-            elif text == '/stop':
-                reply('Bot disabled')
+            elif text.lower() == '/stop':
+                reply('Bot disabled.\nSend /start to enable.')
                 setEnabled(chat_id, False)
+            elif text.lower() == '/commands':
+                reply('Here my commands.')
             elif text == '/image':
                 img = Image.new('RGB', (512, 512))
                 base = random.randint(0, 16777216)
@@ -121,30 +141,26 @@ class WebhookHandler(webapp2.RequestHandler):
                 img.save(output, 'JPEG')
                 reply(img=output.getvalue())
             else:
-                reply('What command?')
+                reply('Scrivi meglio il comando')
 
-        # CUSTOMIZE FROM HERE
+        # START CUSTOMIZING FROM HERE adding the following functions.
+		
+		# Text			reply('your text')
+        # Images		reply(img=urllib2.urlopen('https://telegram.org/img/t_logo.png').read())
+		# Stickers		reply(stk='file_id')
+		# Audio			reply(audio='file_id')
+		# Documents		reply(doc='file_id')
 
-        elif 'who are you' in text:
-            reply('telebot starter kit, created by yukuku: https://github.com/yukuku/telebot')
-        elif 'what time' in text:
-            reply('look at the top-right corner of your screen!')
         else:
-            if getEnabled(chat_id):
-                try:
-                    resp1 = json.load(urllib2.urlopen('http://www.simsimi.com/requestChat?lc=en&ft=1.0&req=' + urllib.quote_plus(text.encode('utf-8'))))
-                    back = resp1.get('res')
-                except urllib2.HTTPError, err:
-                    logging.error(err)
-                    back = str(err)
-                if not back:
-                    reply('okay...')
-                elif 'I HAVE NO RESPONSE' in back:
-                    reply('you said something with no meaning')
-                else:
-                    reply(back)
-            else:
-                logging.info('not enabled for chat_id {}'.format(chat_id))
+			if 'who are you?' in text.lower():
+				reply('I\'m Bob. Your Bot!')
+			if 'image' in text.lower():
+				reply(img=urllib2.urlopen('https://telegram.org/img/t_logo.png').read())
+				
+		# STOP CUSTOMIZING
+		
+			else:
+				logging.info('not enabled for chat_id {}'.format(chat_id))
 
 
 app = webapp2.WSGIApplication([
