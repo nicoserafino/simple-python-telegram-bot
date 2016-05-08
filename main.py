@@ -82,7 +82,7 @@ class WebhookHandler(webapp2.RequestHandler):
             logging.info('no text')
             return
 
-        def reply(msg=None, img=None, stk=None, audio=None, doc=None, fw=None):
+        def reply(msg=None, img=None, stk=None, audio=None, doc=None, fw=None, chat=None, chat1=None, chat2=None, chat3=None, chat4=None, chat5=None):
             if msg:
                 resp = urllib2.urlopen(BASE_URL + 'sendMessage', urllib.urlencode({
                     'chat_id': str(chat_id),
@@ -116,6 +116,12 @@ class WebhookHandler(webapp2.RequestHandler):
                     'from_chat_id': str(chat_id),
                     'message_id': str(message_id),
                 })).read()
+            elif chat:
+                resp = urllib2.urlopen(BASE_URL + 'sendMessage', urllib.urlencode({
+                    'chat_id': 'target_chat_id',
+                    'text': chat.replace("=SEND=", "").encode('utf-8'),
+                    'disable_web_page_preview': 'true',
+                })).read()
             else:
                 logging.error('no msg or img specified')
                 resp = None
@@ -124,43 +130,42 @@ class WebhookHandler(webapp2.RequestHandler):
             logging.info(resp)
 
         if text.startswith('/'):
-            if text.lower() == '/start':
-                reply('Bot enabled.\nSend /commands')
+            if text.lower() == '/start' or text.lower() == '/start@name_of_your_bot':
+                reply('Bot enabled.\nSend /command to list functions.')
                 setEnabled(chat_id, True)
-            elif text.lower() == '/stop':
+            elif text.lower() == '/stop' or text.lower() == '/stop@name_of_your_bot':
                 reply('Bot disabled.\nSend /start to enable.')
                 setEnabled(chat_id, False)
-            elif text.lower() == '/commands':
-                reply('Here my commands.')
-            elif text == '/image':
-                img = Image.new('RGB', (512, 512))
-                base = random.randint(0, 16777216)
-                pixels = [base+i*j for i in range(512) for j in range(512)]  # generate sample image
-                img.putdata(pixels)
-                output = StringIO.StringIO()
-                img.save(output, 'JPEG')
-                reply(img=output.getvalue())
-            else:
-                reply('Scrivi meglio il comando')
+        if text.lower() == '/command'
+            reply('Hello! I\'m a bot.')
 
-        # START CUSTOMIZING FROM HERE adding the following functions.
-		
-		# Text			reply('your text')
-        # Images		reply(img=urllib2.urlopen('https://telegram.org/img/t_logo.png').read())
-		# Stickers		reply(stk='file_id')
+        # CUSTOMIZE FROM HERE 
+		# Testo			reply('testo')
+        # Immagini		reply(img=urllib2.urlopen('https://telegram.org/img/t_logo.png').read())
+		# Sticker		reply(stk='file_id')
 		# Audio			reply(audio='file_id')
-		# Documents		reply(doc='file_id')
+		# Documenti		reply(doc='file_id')
+		# you can find file_id in log section of your Google Cloud Console sending files to the bot 
 
+        elif text.lower() != 'suggest' and 'suggest' in text.lower():
+			reply(fw='your_chat_id')
+			reply('Thank you for suggestion!')
+        elif text.startswith('=SEND='):
+			reply(chat=text)
         else:
-			if 'who are you?' in text.lower():
-				reply('I\'m Bob. Your Bot!')
-			if 'image' in text.lower():
-				reply(img=urllib2.urlopen('https://telegram.org/img/t_logo.png').read())
-				
-		# STOP CUSTOMIZING
-		
-			else:
-				logging.info('not enabled for chat_id {}'.format(chat_id))
+            if getEnabled(chat_id):
+				if 'Hello' in text.lower():
+					reply('Hello!')
+				if 'Who are you' in text.lower():
+					reply('I\'m a bot! My name is TeleBot')
+				if 'sticker' in text.lower():
+					reply(stk='BQADBAADGwADTyaZAjUU-thrRuh9Ag')
+				if 'image' in text.lower():
+					reply(img=urllib2.urlopen('https://telegram.org/img/t_logo.png').read())
+				if text == '/function' or text == '/function@name_of_your_bot':
+					reply('Insert your function')
+            else:
+                logging.info('not enabled for chat_id {}'.format(chat_id))
 
 
 app = webapp2.WSGIApplication([
