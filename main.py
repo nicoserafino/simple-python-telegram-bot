@@ -82,7 +82,7 @@ class WebhookHandler(webapp2.RequestHandler):
             logging.info('no text')
             return
 
-        def reply(msg=None, img=None, stk=None, audio=None, doc=None, fw=None, chat=None, chat1=None, chat2=None, chat3=None, chat4=None, chat5=None):
+        def reply(msg=None, img=None, stk=None, audio=None, doc=None, fw=None, chat=None):
             if msg:
                 resp = urllib2.urlopen(BASE_URL + 'sendMessage', urllib.urlencode({
                     'chat_id': str(chat_id),
@@ -130,10 +130,10 @@ class WebhookHandler(webapp2.RequestHandler):
             logging.info(resp)
 
         if text.startswith('/'):
-            if text.lower() == '/start' or text.lower() == '/start@name_of_your_bot':
+            if text.lower() == '/start' or text.lower() == '/start@YOUR_BOT_NAME':
                 reply('Bot enabled.\nSend /command to list functions.')
                 setEnabled(chat_id, True)
-            elif text.lower() == '/stop' or text.lower() == '/stop@name_of_your_bot':
+            elif text.lower() == '/stop' or text.lower() == '/stop@YOUR_BOT_NAME':
                 reply('Bot disabled.\nSend /start to enable.')
                 setEnabled(chat_id, False)
         if text.lower() == '/command'
