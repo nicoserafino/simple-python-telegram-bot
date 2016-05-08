@@ -65,6 +65,10 @@ Instructions
 19. Open `main.py` file using a good text editor. Change the `YOUR_BOT_TOKEN_HERE` to the token you get from @botfather at step 6, and save the file.
 
    ![main.py](http://i.imgur.com/oNFEdsp.png)
+   
+   * Change 'YOUR_BOT_NAME' on lines 133 and 136.
+   * Change target_chat_id' on line 121. Texting =SEND=hello to the bot, this function forwards 'hello' to a specific chat whose chat_id is showed in the log section of Google Cloud Console.
+   * Change 'your_chat_id' on line 151. If someone texts 'I suggest to in insert this function' to telebot, the message is forwarded to you.
 
 20. Download Google App Engine SDK for Python from https://cloud.google.com/appengine/downloads and install it.
 
