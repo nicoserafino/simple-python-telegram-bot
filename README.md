@@ -1,5 +1,6 @@
 # telebot
 Telegram Bot starter kit. Very easy to install with Google App Engine.
+Based on https://github.com/yukuku/telebot
 
 Instructions
 ============
