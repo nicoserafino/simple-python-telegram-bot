@@ -151,10 +151,10 @@ class WebhookHandler(webapp2.RequestHandler):
 		# you can find file_id in log section of your Google Cloud Console sending files to the bot 
 
         elif text.lower() != 'suggest' and 'suggest' in text.lower():
-			reply(fw='your_chat_id')
-			reply('Thank you for suggestion!')
+            reply(fw='your_chat_id')
+            reply('Thank you for suggestion!')
         elif text.startswith('=SEND='):
-			reply(chat=text)
+            reply(chat=text)
         else:
             if getEnabled(chat_id):
 				if 'Hello' in text.lower():
